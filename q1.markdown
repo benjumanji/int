@@ -1,0 +1,15 @@
+Q1
+==
+
+```
+SELECT count(*) as num_players, Rank
+
+FROM Players
+
+JOIN Levels ON (Players.Level_ID = Levels.Level_ID)
+
+GROUP BY LevelName;
+```
+
+The problem here is that under aggregation all columns in the selection must either be the result of an aggregate functions, part of the grouping clause or a constant (or some combination). The solution is to add the `Rank` to the grouping clause. As aside, depending on the cardinality of the sets in question and how good the query planner is, it might be wise to aggregate on `Level_ID` and perform a join on the aggregated table.
+

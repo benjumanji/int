@@ -1,0 +1,28 @@
+Q2
+==
+
+To try to stick to the spirit in which the question is asked (I'm guessing what that spirit is), I haven't actually tested my hypothesis at the shell.
+
+`yes | nl | head -50 | cut -f 1`
+
+- yes sends an infinite stream of yes' to stdout
+- nl preprends a line number
+- head takes the first 50 of these
+- cut then takes the prepended line numbers
+
+so we have a for-loop that runs from 1 to 50. This could be replaced with seq 1 50.
+
+`head -$(($a*2)) inputfile | tail -1`
+
+We evaluate the sequence from 1 to 50, double it (2..100) and then take the last line of the output. That is to say we will send to stdout lines 100, 98 ... 2.
+
+`awk 'BEGIN{FS="\t"}{print $2}' | xargs wget -c 2> /dev/null`
+
+- We send this output to this awk program, which tab splits the line and prints the second field.
+- xargs splits the args and feeds them to wget. I'm more of a curl man myself so I had to look up what `-c` does in the man pages. It just takes the url and pulls it down, we dump the out to dev null because we don't care about logging.
+
+I can only deduce that the first line of the file isn't interesting (a header perhaps?), and that every even line thereafter consists of some text (no tab), a tab, then a url. The programs behaviour is to pull down the resources at those urls in reverse order and store them in the current dir. Simplifying:
+
+`awk 'NR % 2 == 0' | cut -d'\t' -f2 | xargs wget -c 2> /dev/null`
+
+I know that the cut can be folded into the awk command, but I don't want to spend the time to figure it out.
